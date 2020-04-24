@@ -8,9 +8,12 @@
 • Create database(s) of users' books.
 """
 
+import ux  # Functions for terminal user interaction. TODO after tests -> app.
+
 
 def bookshelves():
-    pass
+    # Retrieve any arguments from command line (path to image, verbose setting)
+    args = ux.get_args()
 
 
 if __name__ == '__main__':
