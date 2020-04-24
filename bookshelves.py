@@ -58,6 +58,9 @@ def bookshelves():
      potential_shelves, __) = identify_shelves(bin_img, axis_size,
                                                window_name, v)
 
+    # Calculate median angle of line segments to get inverse rotation angle.
+    rotation_angle = -1 * geom.get_rotation_angle(potential_shelves, v)
+
 
 def identify_shelves(image, axis, name, verbosity):
     # Get image of shelf line segments, line segments.

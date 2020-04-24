@@ -192,3 +192,8 @@ def user_shelf_check(image, shelf_img, win_name, bookshelf_count):
                                    0.7, 0.0)
 
     return shelf_img, potential_shelves, axis
+
+
+def print_rotation_angle(rotation_angle, v):
+    if v:
+        print(f'Bookshelves are offset {rotation_angle} from horizontal.')
