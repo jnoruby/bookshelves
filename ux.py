@@ -25,12 +25,12 @@ def print_program_introduction(args, v):
 
 def get_image_path(args, v):
 
-    def get_path_leaf(image_path):
+    def get_path_leaf(path):
         # Fix Windows file paths:
-        image_path = image_path.replace('\\', '/')
+        leaf = path.replace('\\', '/')
         # Extract path leaf.
-        path_leaf = image_path.split('/')[-1]
-        return path_leaf
+        leaf = leaf.split('/')[-1]
+        return leaf
 
     if args['image'] is not None:
         image_path = args['image']
@@ -43,9 +43,16 @@ def get_image_path(args, v):
         argument_source = 'runtime user input'
     path_leaf = get_path_leaf(image_path)
     if v:
+        valid_formats = get_imghdr_supported_file_formats().split(' ')
+        valid_formats.append('jpg')
+        file_format = path_leaf.split('.')[-1]
         if len(image_path) == 0:
-            print('No image file was defined. Program cannot continue.')
-            print('Exiting')
+            print('No image file was defined.')
+            print('Program cannot continue. Exiting')
+            exit()
+        if file_format not in valid_formats:
+            print(f'.{file_format} files are not supported.')
+            print('Program cannot continue. Exiting')
             exit()
         print(f'Testing path to bookshelf image {path_leaf}, defined by '
               f'{argument_source}')
