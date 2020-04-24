@@ -66,6 +66,9 @@ def bookshelves():
     # For user output:
     r_grey_img = imutils.rotate_bound(grey_img, rotation_angle)
     r_shelf_img = imutils.rotate_bound(shelf_img, rotation_angle)
+    r_combo_img = cv.addWeighted(r_grey_img, 0.4, r_shelf_img, 0.6, 0.0)
+    # For further processing:
+    r_bin_img = imutils.rotate_bound(bin_img, rotation_angle)
 
 
 def identify_shelves(image, axis, name, verbosity):
