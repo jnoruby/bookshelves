@@ -165,7 +165,7 @@ def resize_window(img):
     return window_width, window_height
 
 
-def user_shelf_check(image, shelf_img, win_name, bookshelf_count):
+def user_shelf_check(image, shelf_bg_img, win_name, bookshelf_count):
     def nothing(x):
         return x
 
@@ -174,24 +174,26 @@ def user_shelf_check(image, shelf_img, win_name, bookshelf_count):
     print('Decrease axis size slide if too many shelves found.')
 
     potential_shelves = None
-    window_width, window_height = resize_window(shelf_img)
+    shelf_img = None
+    axis = None
+    window_width, window_height = resize_window(shelf_bg_img)
     cv.namedWindow(win_name, cv.WINDOW_NORMAL)
     cv.resizeWindow(win_name, window_width, window_height)
     cv.moveWindow(win_name, 20, 20)
     cv.createTrackbar('Axis size', win_name, 15, 300, nothing)
 
     while True:
-        cv.imshow(win_name, shelf_img)
+        cv.imshow(win_name, shelf_bg_img)
         k = cv.waitKey(1) & 0xFF
         if k == 27:
             break
 
         axis = cv.getTrackbarPos('Axis size', win_name)
         shelf_img, potential_shelves = geom.detect_shelves(image, axis)
-        shelf_img = cv.addWeighted(image, 0.3, shelf_img,
-                                   0.7, 0.0)
+        shelf_bg_img = cv.addWeighted(image, 0.3, shelf_img,
+                                      0.7, 0.0)
 
-    return shelf_img, potential_shelves, axis
+    return shelf_bg_img, shelf_img, potential_shelves, axis
 
 
 def print_rotation_angle(rotation_angle, v):

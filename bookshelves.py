@@ -11,6 +11,7 @@
 import ux  # Functions for terminal user interaction. TODO after tests -> app
 import shelf_geometry as geom
 import cv2 as cv  # OpenCV for image processing.
+import imutils
 
 
 def bookshelves():
@@ -48,18 +49,23 @@ def bookshelves():
     ux.image_report(bin_img, window_name, path_leaf, v)
 
     # Detect horizontal line segments to define shelves (-v and user confirms).
+    # Function returns image of shelves against background, line segments
+    # defining shelves, and axis size.
+    # TODO: Don't need axis here, but do for equiv. function getting book edges.
     axis_size = 20  # Determines structuring element size.
     window_name = 'Bookshelf identification image'
     ux.print_load_report(window_name, path_leaf, v)
-
-    # TODO: Don't need axis here, but do for equiv. function getting book edges.
-    # Get image of shelves against background, line segments.
-    (shelf_bg_img,
+    (shelf_bg_img, shelf_img,
      potential_shelves, __) = identify_shelves(bin_img, axis_size,
                                                window_name, v)
 
     # Calculate median angle of line segments to get inverse rotation angle.
     rotation_angle = -1 * geom.get_rotation_angle(potential_shelves, v)
+
+    # Rotate images that will be used for further processing, user output.
+    # For user output:
+    r_grey_img = imutils.rotate_bound(grey_img, rotation_angle)
+    r_shelf_img = imutils.rotate_bound(shelf_img, rotation_angle)
 
 
 def identify_shelves(image, axis, name, verbosity):
@@ -69,13 +75,14 @@ def identify_shelves(image, axis, name, verbosity):
         bookshelf_count = len(potential_shelves)
     except TypeError:
         bookshelf_count = 0
-    shelf_img = cv.addWeighted(image, 0.3, shelf_img, 0.7, 0.0)
+    shelf_bg_img = cv.addWeighted(image, 0.3, shelf_img, 0.7, 0.0)
 
     if verbosity:
-        (shelf_img,
-         potential_shelves, axis) = ux.user_shelf_check(image, shelf_img, name,
+        (shelf_bg_img, shelf_img,
+         potential_shelves, axis) = ux.user_shelf_check(image, shelf_bg_img, name,
                                                         bookshelf_count)
-    return shelf_img, potential_shelves, axis
+
+    return shelf_bg_img, shelf_img, potential_shelves, axis
 
 
 if __name__ == '__main__':
