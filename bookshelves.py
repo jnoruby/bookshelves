@@ -26,12 +26,25 @@ def bookshelves():
     image_path, path_leaf = ux.get_image_path(args, v)
     image_path = ux.open_file(image_path, path_leaf, v)
 
-    # Read original (probably colour) image (-v and user confirms)
+    # Read original (probably colour) image (-v and user confirms).
     # TODO: All current image processing works on greyscale, but colour image
     # TODO will be needed for later spine analysis.
     img = cv.imread(image_path)
     window_name = 'Original image'
     ux.image_report(img, window_name, path_leaf, v)
+
+    # Convert image to greyscale (-v and user confirms).
+    grey_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    window_name = 'Greyscale image'
+    ux.image_report(grey_img, window_name, path_leaf, v)
+
+    # Convert image to binary (-v and user confirms).
+    # TODO: Check if parameters to adaptiveThreshold affect final lines.
+    bin_img = cv.bitwise_not(grey_img)
+    bin_img = cv.adaptiveThreshold(bin_img, 255, cv.ADAPTIVE_THRESH_MEAN_C,
+                                   cv.THRESH_BINARY, 81, 0)
+    window_name = 'Binary image'
+    ux.image_report(bin_img, window_name, path_leaf, v)
 
 
 if __name__ == '__main__':

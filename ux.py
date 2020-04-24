@@ -118,7 +118,7 @@ def image_report(img, name, leaf, v):
 def print_load_report(name, leaf):
     image_type = ' '.join(name.split(' ')[0:-1]).lower()
     if image_type != 'original':
-        print(f'{leaf} converted to {image_type}')
+        print(f'{leaf} converted to {image_type}.')
 
 
 def user_check(name, img):
