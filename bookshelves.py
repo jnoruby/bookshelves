@@ -75,7 +75,9 @@ def bookshelves():
     ux.user_check(window_name, r_combo_img, v)
 
     # Get y value of peaks of distribution of y1 and y2 in bookshelves.
+    # Split binary image into (shelf + 1) binary images for further processing.
     shelf_y = geom.get_shelf_y_values(potential_shelves, v)
+    shelf_regions = geom.split_shelf_regions(r_bin_img, shelf_y, v)
 
 
 def identify_shelves(image, axis, name, verbosity):
@@ -89,8 +91,8 @@ def identify_shelves(image, axis, name, verbosity):
 
     if verbosity:
         (shelf_bg_img, shelf_img,
-         potential_shelves, axis) = ux.user_shelf_check(image, shelf_bg_img, name,
-                                                        bookshelf_count)
+         potential_shelves, axis) = ux.user_shelf_check(image, shelf_bg_img,
+                                                        name, bookshelf_count)
 
     return shelf_bg_img, shelf_img, potential_shelves, axis
 

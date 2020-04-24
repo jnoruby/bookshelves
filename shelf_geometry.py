@@ -76,6 +76,7 @@ def get_rotation_angle(line_segments, v):
 def get_shelf_y_values(line_segments, v):
     """
     :param line_segments: numpy array (segment count, 1, 4)
+    :param v: whether to print verbose output.
     :return: an array of y values defining where bookshelves are in the image.
     """
     shelf_y = np.empty([0])
@@ -87,3 +88,34 @@ def get_shelf_y_values(line_segments, v):
         shelf_y = np.append(shelf_y, np.average(shelf))
     ux.print_shelf_y(shelf_y, v)
     return shelf_y
+
+
+def split_shelf_regions(image, shelf_y, v):
+    shelf_regions = []
+    # Region is entire image if no shelves visible.
+    if len(shelf_y) == 0:
+        shelf_regions.append(image)
+
+    else:
+        # Define width range for slicing.
+        w = range(0, image.shape[1])
+        # Split from top to first shelf.
+        count = 0
+        try:
+            h1 = int(shelf_y[count])
+        except ValueError as e:
+            print(e)
+            print('No regions. Exiting')
+            exit()
+        shelf_regions.append(image[0:h1, w])
+        # Split from first shelf to nth shelf.
+        while count < len(shelf_y) - 1:
+            h2 = int(shelf_y[count + 1])
+            shelf_regions.append(image[h1:h2, w])
+            count = count + 1
+        # Split from nth shelf to bottom.
+        hn = int(shelf_y[count])
+        shelf_regions.append(image[hn:image.shape[0], w])
+    ux.print_shelf_region_report(shelf_regions, v)
+    return shelf_regions
+

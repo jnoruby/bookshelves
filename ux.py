@@ -150,7 +150,7 @@ def image_ok(name, img):
 def create_window(name, img):
     window_width, window_height = resize_window(img)
     cv.namedWindow(name, cv.WINDOW_NORMAL)
-    cv.resizeWindow(name, (window_width, window_height))
+    cv.resizeWindow(name, window_width, window_height)
     cv.moveWindow(name, 50, 50)
 
 
@@ -205,3 +205,8 @@ def print_rotation_angle(rotation_angle, v):
 def print_shelf_y(shelf_y, v):
     if v:
         print(f'Shelves located at {shelf_y}')
+
+
+def print_shelf_region_report(shelf_regions, v):
+    if v:
+        print(f'Image split into {len(shelf_regions)} regions.')
