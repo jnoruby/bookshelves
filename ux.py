@@ -10,3 +10,13 @@ def get_args():
                                                       'interface is verbose')
     args = vars(arg_parser.parse_args())
     return args
+
+
+def print_program_introduction(args, v):
+    msg = (f'This program reads an image of a bookshelf containing books, '
+           f'segments it into images of the individual books\' spines, returns '
+           f'OCR-generated text for each book spine, and creates a first draft'
+           f' book inventory.')
+    if v:
+        print(msg)
+        print(f'Command-line arguments: {args}')
