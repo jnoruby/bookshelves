@@ -9,6 +9,7 @@
 """
 
 import ux  # Functions for terminal user interaction. TODO after tests -> app
+import cv2 as cv  # OpenCV for image processing.
 
 
 def bookshelves():
@@ -23,7 +24,14 @@ def bookshelves():
 
     # Get path to image, rejecting paths not supported by imghdr.
     image_path, path_leaf = ux.get_image_path(args, v)
-    image_path = image_path = ux.open_file(image_path, path_leaf, v)
+    image_path = ux.open_file(image_path, path_leaf, v)
+
+    # Read original (probably colour) image (-v and user confirms)
+    # TODO: All current image processing works on greyscale, but colour image
+    # TODO will be needed for later spine analysis.
+    img = cv.imread(image_path)
+    window_name = 'Original image'
+    ux.image_report(img, window_name, path_leaf, v)
 
 
 if __name__ == '__main__':

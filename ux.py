@@ -1,5 +1,19 @@
 import argparse
 import imghdr
+import cv2 as cv
+
+
+class ClickGetter:
+    good = False
+    done = False
+
+    def callback(self, event, x, y, flags, params):
+        if self.done:
+            return
+        elif event == cv.EVENT_LBUTTONDOWN:
+            self.good = True
+            self.done = True
+        return x, y, flags, params
 
 
 def get_args():
@@ -93,3 +107,57 @@ def open_file(path, leaf, v):
     except IOError as e:
         print(e)
         exit()
+
+
+def image_report(img, name, leaf, v):
+    if v:
+        print_load_report(name, leaf)
+        user_check(name, img)
+
+
+def print_load_report(name, leaf):
+    image_type = ' '.join(name.split(' ')[0:-1]).lower()
+    if image_type != 'original':
+        print(f'{leaf} converted to {image_type}')
+
+
+def user_check(name, img):
+    print('Click the image and press ESC to confirm image.')
+    print('Press ESC without clicking to reject image.')
+    ok = image_ok(name, img)
+    if ok:
+        return True
+    else:
+        print(f'{name} not confirmed by user. Exiting.')
+        exit()
+
+
+def image_ok(name, img):
+    create_window(name, img)
+    click_getter = ClickGetter()
+    cv.setMouseCallback(name, click_getter.callback)
+    while not click_getter.done:
+        cv.imshow(name, img)
+        if cv.waitKey(0) == 27:
+            return click_getter.good
+    cv.moveWindow(name, 500, 0)
+    cv.waitKey(0)
+    return click_getter.good
+
+
+def create_window(name, img):
+    window_width, window_height = resize_window(img)
+    cv.namedWindow(name, cv.WINDOW_NORMAL)
+    cv.resizeWindow(name, (window_width, window_height))
+    cv.moveWindow(name, 50, 50)
+
+
+def resize_window(img):
+    # Locals, change for other testing screens. UI will not use this.
+    screen_res = 2560, 1440
+    scale_width = screen_res[0] / img.shape[1]
+    scale_height = screen_res[1] / img.shape[0]
+    scale = min(scale_width, scale_height)
+    window_width = int(img.shape[1] * scale / 2)
+    window_height = int(img.shape[0] * scale / 2)
+    return window_width, window_height
