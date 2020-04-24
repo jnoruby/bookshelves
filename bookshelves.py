@@ -21,8 +21,9 @@ def bookshelves():
     # Begin verbose reports if verbose set True.
     ux.print_program_introduction(args, v)
 
-    # Get path to image and confirm that it's a valid image with imghdr.
+    # Get path to image, rejecting paths not supported by imghdr.
     image_path, path_leaf = ux.get_image_path(args, v)
+    image_path = image_path = ux.open_file(image_path, path_leaf, v)
 
 
 if __name__ == '__main__':

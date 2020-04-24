@@ -75,3 +75,21 @@ def get_imghdr_supported_file_formats():
         supported_types = ('jpeg png gif tiff rgb bpm pgm ppm rast xbm bmp '
                            'webp exr')
     return supported_types.strip()
+
+
+def open_file(path, leaf, v):
+    try:
+        fd = open(path, 'r')
+        if v:
+            print(f'Loading {leaf}...')
+        # Check validity of file with imghdr, as OpenCV has no error checking.
+        if imghdr.what(path) is not None:
+            fd.close()
+            return path
+        else:
+            print(f'{leaf} is not recognised as a valid image by imghdr.')
+            fd.close()
+            exit()
+    except IOError as e:
+        print(e)
+        exit()
