@@ -111,19 +111,20 @@ def open_file(path, leaf, v):
 
 def image_report(img, name, leaf, v):
     if v:
-        print_load_report(name, leaf)
-        user_check(name, img)
+        print_load_report(name, leaf, v)
+        user_check(name, img, v)
 
 
-def print_load_report(name, leaf):
+def print_load_report(name, leaf, v):
     image_type = ' '.join(name.split(' ')[0:-1]).lower()
-    if image_type != 'original':
+    if image_type != 'original' and v:
         print(f'{leaf} converted to {image_type}.')
 
 
-def user_check(name, img):
-    print('Click the image and press ESC to confirm image.')
-    print('Press ESC without clicking to reject image.')
+def user_check(name, img, v):
+    if v:
+        print('Click the image and press ESC to confirm image.')
+        print('Press ESC without clicking to reject image.')
     ok = image_ok(name, img)
     if ok:
         return True

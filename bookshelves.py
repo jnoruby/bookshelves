@@ -46,6 +46,10 @@ def bookshelves():
     window_name = 'Binary image'
     ux.image_report(bin_img, window_name, path_leaf, v)
 
+    # Detect horizontal line segments to define shelves (-v and user confirms).
+    axis_size = 20  # Determines structuring element size.
+    window_name = 'Bookshelf identification image'
+    ux.print_load_report(window_name, path_leaf, v)
 
 if __name__ == '__main__':
     bookshelves()
