@@ -70,9 +70,12 @@ def bookshelves():
     # For further processing:
     r_bin_img = imutils.rotate_bound(bin_img, rotation_angle)
 
+    # User check rotation (-v)
+    window_name = 'Rotated with respect to shelves image'
+    ux.user_check(window_name, r_combo_img, v)
+
     # Get y value of peaks of distribution of y1 and y2 in bookshelves.
-    shelf_y = geom.get_shelf_y_values(potential_shelves)
-    print(shelf_y)
+    shelf_y = geom.get_shelf_y_values(potential_shelves, v)
 
 
 def identify_shelves(image, axis, name, verbosity):

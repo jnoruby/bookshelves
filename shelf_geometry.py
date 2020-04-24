@@ -73,7 +73,7 @@ def get_rotation_angle(line_segments, v):
     return rotation_angle
 
 
-def get_shelf_y_values(line_segments):
+def get_shelf_y_values(line_segments, v):
     """
     :param line_segments: numpy array (segment count, 1, 4)
     :return: an array of y values defining where bookshelves are in the image.
@@ -85,4 +85,5 @@ def get_shelf_y_values(line_segments):
 
     for shelf in shelf_ls:
         shelf_y = np.append(shelf_y, np.average(shelf))
+    ux.print_shelf_y(shelf_y, v)
     return shelf_y
