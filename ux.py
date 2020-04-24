@@ -1,3 +1,4 @@
+import shelf_geometry as geom
 import argparse
 import imghdr
 import cv2 as cv
@@ -162,3 +163,32 @@ def resize_window(img):
     window_width = int(img.shape[1] * scale / 2)
     window_height = int(img.shape[0] * scale / 2)
     return window_width, window_height
+
+
+def user_shelf_check(image, shelf_img, win_name, bookshelf_count):
+    def nothing(x):
+        return x
+
+    print(f'{bookshelf_count} potential bookshelf line segments extracted.')
+    print('Increase axis size slider if not enough shelves found.')
+    print('Decrease axis size slide if too many shelves found.')
+
+    potential_shelves = None
+    window_width, window_height = resize_window(shelf_img)
+    cv.namedWindow(win_name, cv.WINDOW_NORMAL)
+    cv.resizeWindow(win_name, window_width, window_height)
+    cv.moveWindow(win_name, 20, 20)
+    cv.createTrackbar('Axis size', win_name, 15, 300, nothing)
+
+    while True:
+        cv.imshow(win_name, shelf_img)
+        k = cv.waitKey(1) & 0xFF
+        if k == 27:
+            break
+
+        axis = cv.getTrackbarPos('Axis size', win_name)
+        shelf_img, potential_shelves = geom.detect_shelves(image, axis)
+        shelf_img = cv.addWeighted(image, 0.3, shelf_img,
+                                   0.7, 0.0)
+
+    return shelf_img, potential_shelves, axis

@@ -9,6 +9,7 @@
 """
 
 import ux  # Functions for terminal user interaction. TODO after tests -> app
+import shelf_geometry as geom
 import cv2 as cv  # OpenCV for image processing.
 
 
@@ -42,7 +43,7 @@ def bookshelves():
     # TODO: Check if parameters to adaptiveThreshold affect final lines.
     bin_img = cv.bitwise_not(grey_img)
     bin_img = cv.adaptiveThreshold(bin_img, 255, cv.ADAPTIVE_THRESH_MEAN_C,
-                                   cv.THRESH_BINARY, 81, 0)
+                                   cv.THRESH_BINARY, 15, 0)
     window_name = 'Binary image'
     ux.image_report(bin_img, window_name, path_leaf, v)
 
@@ -50,6 +51,29 @@ def bookshelves():
     axis_size = 20  # Determines structuring element size.
     window_name = 'Bookshelf identification image'
     ux.print_load_report(window_name, path_leaf, v)
+
+    # TODO: Don't need axis here, but do for equiv. function getting book edges.
+    # Get image of shelves against background, line segments.
+    (shelf_bg_img,
+     potential_shelves, __) = identify_shelves(bin_img, axis_size,
+                                               window_name, v)
+
+
+def identify_shelves(image, axis, name, verbosity):
+    # Get image of shelf line segments, line segments.
+    shelf_img, potential_shelves = geom.detect_shelves(image, axis)
+    try:
+        bookshelf_count = len(potential_shelves)
+    except TypeError:
+        bookshelf_count = 0
+    shelf_img = cv.addWeighted(image, 0.3, shelf_img, 0.7, 0.0)
+
+    if verbosity:
+        (shelf_img,
+         potential_shelves, axis) = ux.user_shelf_check(image, shelf_img, name,
+                                                        bookshelf_count)
+    return shelf_img, potential_shelves, axis
+
 
 if __name__ == '__main__':
     bookshelves()
