@@ -105,6 +105,7 @@ def split_shelf_regions(image, shelf_y, v):
             h1 = int(shelf_y[count])
         except ValueError as e:
             print(e)
+            h1 = None
             print('No regions. Exiting')
             exit()
         shelf_regions.append(image[0:h1, w])

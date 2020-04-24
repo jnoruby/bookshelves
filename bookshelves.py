@@ -51,7 +51,6 @@ def bookshelves():
     # Detect horizontal line segments to define shelves (-v and user confirms).
     # Function returns image of shelves against background, line segments
     # defining shelves, and axis size.
-    # TODO: Don't need axis here, but do for equiv. function getting book edges.
     axis_size = 20  # Determines structuring element size.
     window_name = 'Bookshelf identification image'
     ux.print_load_report(window_name, path_leaf, v)
@@ -77,7 +76,13 @@ def bookshelves():
     # Get y value of peaks of distribution of y1 and y2 in bookshelves.
     # Split binary image into (shelf + 1) binary images for further processing.
     shelf_y = geom.get_shelf_y_values(potential_shelves, v)
-    shelf_regions = geom.split_shelf_regions(r_bin_img, shelf_y, v)
+    shelf_bin_imgs = geom.split_shelf_regions(r_bin_img, shelf_y, v)
+
+    # Detect horizontal and vertical line segments to define book edges
+    # (-v and user confirms). TODO Function returns ... (see above)
+    axis_size = 80  # Determines structuring element size. # TODO vertical diff
+    for shelf_bin_img in shelf_bin_imgs:
+        identify_book_edges(shelf_bin_img, axis_size, v)
 
 
 def identify_shelves(image, axis, name, verbosity):
@@ -95,6 +100,16 @@ def identify_shelves(image, axis, name, verbosity):
                                                         name, bookshelf_count)
 
     return shelf_bg_img, shelf_img, potential_shelves, axis
+
+
+def identify_book_edges(shelf_bin_img, axis_size, v):
+    ux.user_check('Shelf binary image', shelf_bin_img, v)
+
+    # TODO Force values 22, 40, 85, 81 for test consistency
+    # Detect horizontals (book edges, book spine structural elements).
+    books_img, potential_books = geom.detect_shelves(shelf_bin_img, axis_size)
+    print(potential_books)
+    ux.user_check('book horizontals?', books_img, v)
 
 
 if __name__ == '__main__':
