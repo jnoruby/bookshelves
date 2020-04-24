@@ -65,8 +65,7 @@ def get_rotation_angle(line_segments, v):
         for line_segment in line_segments:
             for x1, y1, x2, y2 in line_segment:
                 angle = degrees(atan2(y2 - y1, x2 - x1))
-                if angle != 0:
-                    angles = np.append(angles, angle)
+                angles = np.append(angles, angle)
     except TypeError as e:
         print(e)
     rotation_angle = np.median(angles)
