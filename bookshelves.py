@@ -12,7 +12,10 @@ import ux  # Functions for terminal user interaction. TODO after tests -> app
 import shelf_geometry as geom
 import cv2 as cv  # OpenCV for image processing.
 import imutils
+import matplotlib.pyplot as plt
+from matplotlib import collections as mc
 import numpy as np
+import pylab as pl
 
 
 def bookshelves():
@@ -108,6 +111,8 @@ def identify_shelves(image, axis, name, verbosity):
 
 
 def identify_book_edges(shelf_bin_img, axis_size, v):
+    pass
+    
     ux.user_check('Shelf binary image', shelf_bin_img, v)
 
     win_name = 'Horizontal edge checker'
@@ -120,7 +125,7 @@ def identify_book_edges(shelf_bin_img, axis_size, v):
      axis_size) = ux.shelf_identification_report(shelf_bin_img,
                                                  axis_size,
                                                  win_name, False)
-
+    print(len(book_edges_x))
     win_name = 'Vertical edge checker'
     # Rotate image to detect verticals with same HoughLinesP settings.
     # rotate_bound is derived from imutils function but also returns matrix.
@@ -143,6 +148,7 @@ def identify_book_edges(shelf_bin_img, axis_size, v):
     shelf_bin_img = cv.addWeighted(shelf_bin_img_x, 0.5, shelf_bin_img_y, 0.5,
                                    0.0)
     ux.user_check('combined', shelf_bin_img, v)
+    ux.user_check('horizontal only', shelf_bin_img_x, v)
 
 
 if __name__ == '__main__':

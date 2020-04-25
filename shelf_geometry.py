@@ -7,7 +7,7 @@ from math import degrees, atan2
 def detect_line_segments(img, axis_size):
     # Detect horizontal lines.
     line_img = create_line_structure(img, axis_size, 'horizontal')
-    line_segments = cv.HoughLinesP(line_img, 1, np.pi/180, 15, 900, 500)
+    line_segments = cv.HoughLinesP(line_img, 1, np.pi/90, 15, 50, 50)
 
     return line_img, line_segments
 
