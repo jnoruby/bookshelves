@@ -12,10 +12,6 @@ import ux  # Functions for terminal user interaction. TODO after tests -> app
 import shelf_geometry as geom
 import cv2 as cv  # OpenCV for image processing.
 import imutils
-import matplotlib.pyplot as plt
-from matplotlib import collections as mc
-import numpy as np
-import pylab as pl
 
 
 def bookshelves():
@@ -24,8 +20,6 @@ def bookshelves():
 
     # Set verbose boolean. Default to False if not set True in command line.
     v = args['verbose'] if args['verbose'] else False
-
-    print(v)
 
     # Begin verbose reports if verbose set True.
     ux.print_program_introduction(args, v)
@@ -77,7 +71,8 @@ def bookshelves():
 
     # User check rotation (-v)
     window_name = 'Rotated with respect to shelves image'
-    ux.user_check(window_name, r_combo_img, v)
+
+    ux.user_check(window_name, r_combo_img, False)
 
     # Get y value of peaks of distribution of y1 and y2 in bookshelves.
     # Split binary image into (shelf + 1) binary images for further processing.
@@ -93,7 +88,7 @@ def bookshelves():
     identify_book_edges(shelf_bin_imgs[0], axis_size, v)
 
 
-def identify_shelves(image, axis, name, verbosity):
+def identify_shelves(image, axis, name, v):
     # Get image of shelf line segments, line segments.
     shelf_img, potential_shelves = geom.detect_line_segments(image, axis)
     try:
@@ -101,8 +96,7 @@ def identify_shelves(image, axis, name, verbosity):
     except TypeError:
         bookshelf_count = 0
     shelf_bg_img = cv.addWeighted(image, 0.3, shelf_img, 0.7, 0.0)
-
-    if verbosity:
+    if v:
         (shelf_bg_img, shelf_img,
          potential_shelves, axis) = ux.user_shelf_check(image, shelf_bg_img,
                                                         name, bookshelf_count)
@@ -148,7 +142,7 @@ def identify_book_edges(shelf_bin_img, axis_size, v):
     shelf_bin_img = cv.addWeighted(shelf_bin_img_x, 0.5, shelf_bin_img_y, 0.5,
                                    0.0)
     ux.user_check('combined', shelf_bin_img, v)
-    ux.user_check('horizontal only', shelf_bin_img_x, v)
+    ux.user_check('horizontal only', shelf_bin_img_x, True)
 
 
 if __name__ == '__main__':

@@ -126,12 +126,10 @@ def user_check(name, img, v):
     if v:
         print('Click the image and press ESC to confirm image.')
         print('Press ESC without clicking to reject image.')
-    ok = image_ok(name, img)
-    if ok:
-        return True
-    else:
-        print(f'{name} not confirmed by user. Exiting.')
-        exit()
+        ok = image_ok(name, img)
+        if not ok:
+            print(f'{name} not confirmed by user. Exiting.')
+            exit()
 
 
 def image_ok(name, img):
