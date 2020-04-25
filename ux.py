@@ -189,7 +189,7 @@ def user_shelf_check(image, shelf_bg_img, win_name, bookshelf_count):
             break
 
         axis = cv.getTrackbarPos('Axis size', win_name)
-        shelf_img, potential_shelves = geom.detect_shelves(image, axis)
+        shelf_img, potential_shelves = geom.detect_line_segments(image, axis)
         shelf_bg_img = cv.addWeighted(image, 0.3, shelf_img,
                                       0.7, 0.0)
 
@@ -210,3 +210,43 @@ def print_shelf_y(shelf_y, v):
 def print_shelf_region_report(shelf_regions, v):
     if v:
         print(f'Image split into {len(shelf_regions)} regions.')
+
+
+def shelf_identification_report(binary_img, axis_size, name, v):
+
+    horizontal_image, shelves = geom.detect_line_segments(binary_img,
+                                                          axis_size)
+    try:
+        bookshelf_count = len(shelves)
+    except TypeError:
+        bookshelf_count = 0
+    if v:
+        print(f'{bookshelf_count} potential bookshelf line segments extracted.')
+        print('Increase axis size slider if not enough shelves found.')
+        print('Decrease axis size slide if too many shelves found.')
+    shelf_img = cv.addWeighted(binary_img, 0.3, horizontal_image, 0.7, 0.0)
+
+    if v:
+        def nothing(x):
+            return x
+        window_name = name
+        window_width, window_height = resize_window(shelf_img)
+        cv.namedWindow(window_name, cv.WINDOW_NORMAL)
+        cv.resizeWindow(window_name, window_width, window_height)
+        cv.moveWindow(window_name, 20, 20)
+        cv.createTrackbar('Axis size', window_name, 15, 300, nothing)
+
+        while True:
+            cv.imshow(window_name, shelf_img)
+            k = cv.waitKey(1) & 0xFF
+            if k == 27:
+                break
+
+            axis_size = cv.getTrackbarPos('Axis size', window_name)
+            horizontal_img, shelves = geom.detect_line_segments(binary_img,
+                                                                axis_size)
+            shelf_img = cv.addWeighted(binary_img, 0.3, horizontal_img,
+                                       0.7, 0.0)
+
+        cv.destroyAllWindows()
+    return shelf_img, horizontal_image, shelves, axis_size

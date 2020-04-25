@@ -4,12 +4,12 @@ import numpy as np
 from math import degrees, atan2
 
 
-def detect_shelves(img, axis_size):
+def detect_line_segments(img, axis_size):
     # Detect horizontal lines.
-    line_structure = create_line_structure(img, axis_size, 'horizontal')
-    potential_bookshelves = cv.HoughLinesP(line_structure, 1, np.pi/180, 15,
-                                           900, 500)
-    return line_structure, potential_bookshelves
+    line_img = create_line_structure(img, axis_size, 'horizontal')
+    line_segments = cv.HoughLinesP(line_img, 1, np.pi/180, 15, 900, 500)
+
+    return line_img, line_segments
 
 
 def create_line_structure(image, axis_size, direction):
@@ -120,3 +120,34 @@ def split_shelf_regions(image, shelf_y, v):
     ux.print_shelf_region_report(shelf_regions, v)
     return shelf_regions
 
+
+# From imutils, adapted.
+def rotate_bound(image, angle):
+    # Grab the dimensions of hte image and then determine the center.
+    (h, w) = image.shape[:2]
+    (cx, cy) = (w // 2, h // 2)
+    # Grab the rotation matrix (applying the negative of the angle to
+    # rotate clockwise), then grab the sine and cosine (i.e., the
+    # rotation components of the matrix)
+    m = cv.getRotationMatrix2D((cx, cy), -angle, 1.0)
+    cos = np.abs(m[0, 0])
+    sin = np.abs(m[0, 1])
+    # Compute the new bounding dimensions of the image
+    nw = int((h * sin) + (w * cos))
+    nh = int((h * cos) + (w * sin))
+    # Adjust the rotation matrix to take into account translation
+    m[0, 2] += (nw / 2) - cx
+    m[1, 2] += (nh / 2) - cy
+    # Perform the actual rotation and return both the image and matrix.
+    return cv.warpAffine(image, m, (nw, nh)), m
+
+
+def get_slope(x1, y1, x2, y2):
+    if x2 - x1 == 0:
+        return None
+    else:
+        return (y2 - y1) / (x2 - x1)
+
+
+def get_length(x1, y1, x2, y2):
+    return np.sqrt((x2 - x1)**2 + (y2 - y1)**2)

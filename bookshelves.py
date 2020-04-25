@@ -12,6 +12,7 @@ import ux  # Functions for terminal user interaction. TODO after tests -> app
 import shelf_geometry as geom
 import cv2 as cv  # OpenCV for image processing.
 import imutils
+import numpy as np
 
 
 def bookshelves():
@@ -20,6 +21,8 @@ def bookshelves():
 
     # Set verbose boolean. Default to False if not set True in command line.
     v = args['verbose'] if args['verbose'] else False
+
+    print(v)
 
     # Begin verbose reports if verbose set True.
     ux.print_program_introduction(args, v)
@@ -80,14 +83,16 @@ def bookshelves():
 
     # Detect horizontal and vertical line segments to define book edges
     # (-v and user confirms). TODO Function returns ... (see above)
-    axis_size = 80  # Determines structuring element size. # TODO vertical diff
-    for shelf_bin_img in shelf_bin_imgs:
-        identify_book_edges(shelf_bin_img, axis_size, v)
+    axis_size = 180  # Determines structuring element size. # TODO vertical diff
+    # TODO: Figure out a not image-specific way to exclude too-thin segment.
+    # for shelf_bin_img in shelf_bin_imgs:
+    #     identify_book_edges(shelf_bin_img, axis_size, v)
+    identify_book_edges(shelf_bin_imgs[0], axis_size, v)
 
 
 def identify_shelves(image, axis, name, verbosity):
     # Get image of shelf line segments, line segments.
-    shelf_img, potential_shelves = geom.detect_shelves(image, axis)
+    shelf_img, potential_shelves = geom.detect_line_segments(image, axis)
     try:
         bookshelf_count = len(potential_shelves)
     except TypeError:
@@ -105,11 +110,39 @@ def identify_shelves(image, axis, name, verbosity):
 def identify_book_edges(shelf_bin_img, axis_size, v):
     ux.user_check('Shelf binary image', shelf_bin_img, v)
 
-    # TODO Force values 22, 40, 85, 81 for test consistency
-    # Detect horizontals (book edges, book spine structural elements).
-    books_img, potential_books = geom.detect_shelves(shelf_bin_img, axis_size)
-    print(potential_books)
-    ux.user_check('book horizontals?', books_img, v)
+    win_name = 'Horizontal edge checker'
+    # Horizontal again with in shelf region)
+    (__, shelf_bin_img_x, book_edges_x,
+     axis_size) = ux.shelf_identification_report(shelf_bin_img, axis_size,
+                                                 win_name, v)
+    # Again with axis_size defined.
+    (__, shelf_bin_img_x, book_edges_x,
+     axis_size) = ux.shelf_identification_report(shelf_bin_img,
+                                                 axis_size,
+                                                 win_name, False)
+
+    win_name = 'Vertical edge checker'
+    # Rotate image to detect verticals with same HoughLinesP settings.
+    # rotate_bound is derived from imutils function but also returns matrix.
+    r_shelf_bin_img, rotation_m = geom.rotate_bound(shelf_bin_img, 90)
+
+    (__, r_shelf_bin_img_y, r_book_edges_y,
+     axis_size) = ux.shelf_identification_report(r_shelf_bin_img,
+                                                 axis_size,
+                                                 win_name, v)
+    # Again with axis size defined.
+    (__, r_shelf_bin_img_y, r_book_edges_y,
+     axis_size) = ux.shelf_identification_report(r_shelf_bin_img,
+                                                 axis_size,
+                                                 win_name, False)
+
+    # Would be better to rotate points, but just combining the images instead
+    # until can figure out affine transformation of point coords.
+    shelf_bin_img_y, rotation_m = geom.rotate_bound(r_shelf_bin_img_y, -90)
+
+    shelf_bin_img = cv.addWeighted(shelf_bin_img_x, 0.5, shelf_bin_img_y, 0.5,
+                                   0.0)
+    ux.user_check('combined', shelf_bin_img, v)
 
 
 if __name__ == '__main__':
